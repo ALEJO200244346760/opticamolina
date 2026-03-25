@@ -1,12 +1,11 @@
 // Archivo: src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Navbar from './components/Navbar';
-import Login from './pages/Login.jsx';      // <--- Agregá .jsx
-import Home from './pages/Home.jsx';        // <--- Agregá .jsx
+import Login from './pages/Login.jsx';
+import Home from './pages/Home.jsx'; // Lo crearemos después
 import AdminPanel from './pages/AdminPanel.jsx';
-import Success from './pages/Success.jsx';
-import Failure from './pages/Failure.jsx';
+import Success from './pages/Success';
+import Failure from './pages/Failure';
 
 function App() {
   return (
