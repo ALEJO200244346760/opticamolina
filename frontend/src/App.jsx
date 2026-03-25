@@ -17,10 +17,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminPanel />} /> 
             <Route path="/success" element={<Success />} />
             <Route path="/failure" element={<Failure />} />
-            <Route path="/register" element={<Register />} />
           </Routes>
         </div>
       </div>
