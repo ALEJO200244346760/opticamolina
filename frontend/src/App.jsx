@@ -1,9 +1,9 @@
 // Archivo: src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Home from './pages/Home'; // Lo crearemos después
-import AdminPanel from './pages/AdminPanel';
+import Login from './pages/Login.jsx';
+import Home from './pages/Home.jsx'; // Lo crearemos después
+import AdminPanel from './pages/AdminPanel.jsx';
 import Success from './pages/Success';
 import Failure from './pages/Failure';
 
