@@ -6,7 +6,7 @@ import Home from './pages/Home.jsx'; // Lo crearemos después
 import AdminPanel from './pages/AdminPanel.jsx';
 import Success from './pages/Success';
 import Failure from './pages/Failure';
-import Register from './pages/Register';
+import Register from './pages/Register.jsx';
 
 function App() {
   return (
