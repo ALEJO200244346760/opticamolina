@@ -35,7 +35,11 @@ public class PublicController {
     // --- CORREGIDO: Ya no usa .map() porque el Service devuelve Product directamente ---
     @GetMapping("/products/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        try {
+            Product product = productService.getProductById(id);
+            return ResponseEntity.ok(product);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build(); // Esto devuelve el 404 que React entiende mejor
+        }
     }
 }

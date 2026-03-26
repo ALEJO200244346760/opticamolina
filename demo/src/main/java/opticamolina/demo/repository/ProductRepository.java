@@ -1,4 +1,4 @@
-// Archivo: src/main/java/opticamolina/demo/repositories/ProductRepository.java
+// Archivo: src/main/java/opticamolina/demo/repository/ProductRepository.java
 package opticamolina.demo.repository;
 
 import opticamolina.demo.model.Product;
