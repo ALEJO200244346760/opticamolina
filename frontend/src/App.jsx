@@ -2,11 +2,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx'; // Lo crearemos después
+import Home from './pages/Home.jsx'; 
 import AdminPanel from './pages/AdminPanel.jsx';
 import Success from './pages/Success';
 import Failure from './pages/Failure';
 import Register from './pages/Register.jsx';
+import ProductDetail from './components/ProductDetail.jsx'; // <--- 1. IMPORTALO AQUÍ
 
 function App() {
   return (
@@ -19,6 +20,10 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/admin" element={<AdminPanel />} /> 
+            
+            {/* 2. AGREGÁ ESTA RUTA PARA EL DETALLE */}
+            <Route path="/product/:id" element={<ProductDetail />} />
+            
             <Route path="/success" element={<Success />} />
             <Route path="/failure" element={<Failure />} />
           </Routes>
