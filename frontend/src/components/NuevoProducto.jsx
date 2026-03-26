@@ -24,15 +24,24 @@ const NuevoProducto = ({ isOpen, onClose, onSuccess }) => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        const res = await api.get('/admin/categories');
-        setCategories(res.data);
-      } catch (err) {
-        console.error("Error cargando categorías:", err);
-      }
-    };
-    if (isOpen) fetchCategories();
-  }, [isOpen]);
+    try {
+      // Suponiendo que tu token lo guardaste en localStorage
+      const token = localStorage.getItem("token");
+
+      const res = await api.get("/admin/categories", {
+        headers: {
+          Authorization: `Bearer ${token}`, // envía el JWT
+        },
+        withCredentials: true, // si usas cookies, opcional
+      });
+
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Error cargando categorías:", err);
+    }
+  };
+  if (isOpen) fetchCategories();
+}, [isOpen]);
 
   const handleSaveProduct = async (e) => {
     e.preventDefault();
