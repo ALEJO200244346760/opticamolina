@@ -25,7 +25,7 @@ const NuevoProducto = ({ isOpen, onClose, onSuccess }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/public/categories');
+        const res = await api.get('/admin/categories');
         setCategories(res.data);
       } catch (err) {
         console.error("Error cargando categorías:", err);
