@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     @Autowired
-    private AuthenticationManager authenticationManager; // Agregado para validar correctamente
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -59,28 +59,27 @@ public class AuthController {
         return ResponseEntity.ok("Usuario registrado exitosamente.");
     }
 
-    // --- LOGIN CORREGIDO PARA JWT CON ROLES ---
+    // --- LOGIN CORREGIDO ---
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
-        // 1. Autenticación formal de Spring (valida email y password en un solo paso)
+        // 1. Autenticamos
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
 
-        // 2. Establecemos la autenticación en el contexto
+        // 2. Establecemos el contexto
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Generamos el Token usando el nuevo método que creamos en JwtUtils
-        // Este método ahora sí mete los roles (ADMIN, CLIENTE, etc.) en el payload
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        // 4. Obtenemos los roles para devolverlos en la respuesta del JSON
+        // 3. Obtenemos los roles PRIMERO
         List<String> roles = authentication.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        // Devolvemos el token con la "pulserita VIP" incluida
+        // 4. Generamos el Token pasándole los dos datos que ahora pide JwtUtils
+        String jwt = jwtUtils.generateJwtToken(loginRequest.getEmail(), roles);
+
+        // Devolvemos el JSON de respuesta
         return ResponseEntity.ok(new JwtResponse(jwt, loginRequest.getEmail(), roles));
     }
 }
