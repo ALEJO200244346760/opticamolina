@@ -7,35 +7,25 @@ import AdminPanel from './pages/AdminPanel.jsx';
 import Success from './pages/Success';
 import Failure from './pages/Failure';
 import Register from './pages/Register.jsx';
-import ProductDetail from './pages/ProductDetail.jsx';
+import ProductDetail from './components/ProductDetail.jsx'; // Asegúrate que esté en pages si es una vista completa
 
 function App() {
   return (
     <Router>
-      {/* Fondo Negro Profundo (#050505) 
-          Agregamos un sutil resplandor uva en la esquina para dar profundidad 
-      */}
-      <div className="min-h-screen bg-[#050505] font-sans text-gray-200 selection:bg-[#4a0e2e] selection:text-white">
-        
-        {/* Gradiente de fondo fijo para dar esa sensación del logo en toda la app */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] bg-[#4a0e2e] opacity-[0.07] blur-[120px] rounded-full"></div>
-          <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-[#1a1a1a] opacity-[0.1] blur-[100px] rounded-full"></div>
-        </div>
-
-        <div className="relative z-10">
-          <Navbar />
-          <main className="w-full">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/admin" element={<AdminPanel />} /> 
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/success" element={<Success />} />
-              <Route path="/failure" element={<Failure />} />
-            </Routes>
-          </main>
+      {/* Cambiamos el fondo a uno más limpio para que resalte el contenido */}
+      <div className="min-h-screen bg-[#FDFDFD] font-sans">
+        <Navbar />
+        {/* Sacamos el 'p-4' del container para que el Hero del Home sea Full Width */}
+        <div className="w-full">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/admin" element={<AdminPanel />} /> 
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/success" element={<Success />} />
+            <Route path="/failure" element={<Failure />} />
+          </Routes>
         </div>
       </div>
     </Router>
