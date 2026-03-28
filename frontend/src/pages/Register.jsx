@@ -13,88 +13,89 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Validación básica de contraseñas
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
-
     try {
-      // Enviamos email y password al endpoint de tu AuthController en Railway
-      await api.post('/auth/register', {
-        email,
-        password
-      });
-
+      await api.post('/auth/register', { email, password });
       alert("¡Cuenta de Óptica Molina creada con éxito!");
-      navigate('/login'); // Una vez registrado, lo mandamos a loguearse
-      
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data || 'Error al intentar registrarse.');
-      console.error('Error en registro:', err);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-[80vh]">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-100">
-        <h2 className="text-2xl font-bold text-center mb-6 text-primary">Crear Cuenta</h2>
+    <div className="flex justify-center items-center min-h-[90vh] bg-[#FDFDFD] px-4 py-10">
+      <div className="bg-white p-10 rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.06)] w-full max-w-lg border border-gray-50">
+        
+        <div className="text-center mb-8">
+          <div className="inline-block bg-[#4a0e2e]/5 text-[#4a0e2e] px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-4">
+            Unite a la comunidad
+          </div>
+          <h2 className="text-4xl font-black text-slate-900 tracking-tight italic">Registrate</h2>
+          <p className="text-gray-400 text-sm mt-2 font-light italic">Descubrí una nueva forma de ver el mundo.</p>
+        </div>
         
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">
+          <div className="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-xs font-bold text-center border border-red-100">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5">
           <div>
-            <label className="block text-gray-700 mb-1 font-medium">Email</label>
+            <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Tu mejor Email</label>
             <input 
               type="email" 
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-secondary border-gray-300"
+              className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4a0e2e] transition-all outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="ejemplo@correo.com"
               required
             />
           </div>
-          <div>
-            <label className="block text-gray-700 mb-1 font-medium">Contraseña</label>
-            <input 
-              type="password" 
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-secondary border-gray-300"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              required
-            />
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Contraseña</label>
+              <input 
+                type="password" 
+                className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4a0e2e] transition-all outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 6"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-2 ml-1">Confirmar</label>
+              <input 
+                type="password" 
+                className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-[#4a0e2e] transition-all outline-none"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repetila"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 mb-1 font-medium">Confirmar Contraseña</label>
-            <input 
-              type="password" 
-              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-secondary border-gray-300"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Repetí tu contraseña"
-              required
-            />
-          </div>
+
           <button 
             type="submit" 
-            className="w-full bg-secondary hover:bg-teal-700 text-white font-bold py-2 px-4 rounded transition-colors mt-2"
+            className="w-full bg-[#4a0e2e] hover:bg-[#1a1a1a] text-white font-black py-4 rounded-2xl transition-all duration-300 shadow-xl uppercase tracking-[0.2em] text-xs mt-4 transform active:scale-95"
           >
-            Registrarse
+            Crear mi cuenta
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <button 
             onClick={() => navigate('/login')}
-            className="text-primary hover:underline text-sm font-medium"
+            className="text-gray-400 hover:text-black text-[11px] font-bold uppercase tracking-widest transition-colors"
           >
-            ¿Ya tenés cuenta? Inicia sesión acá
+            ¿Ya tenés cuenta? <span className="underline text-[#4a0e2e]">Iniciá sesión acá</span>
           </button>
         </div>
       </div>
