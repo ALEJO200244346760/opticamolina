@@ -7,7 +7,7 @@ import AdminPanel from './pages/AdminPanel.jsx';
 import Success from './pages/Success';
 import Failure from './pages/Failure';
 import Register from './pages/Register.jsx';
-import ProductDetail from './components/ProductDetail.jsx'; // <--- 1. IMPORTALO AQUÍ
+import ProductDetail from './components/ProductDetail.jsx';
 
 function App() {
   return (

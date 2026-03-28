@@ -19,6 +19,11 @@ const Navbar = () => {
     <nav className="bg-primary text-black p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold tracking-wider">
+        <img 
+          src="/IMG_3486.jpg" 
+          alt="Logo Óptica Molina" 
+          className="h-10 w-auto"
+        />
           ÓPTICA MOLINA
         </Link>
         <div className="space-x-4">

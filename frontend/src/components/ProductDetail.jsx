@@ -122,7 +122,7 @@ const ProductDetail = () => {
               className="w-full bg-[#009EE3] text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#008bc7] transition-all shadow-lg flex items-center justify-center gap-3 transform active:scale-95"
             >
               <img 
-                src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/5.19.1/mercadopago/logo__small@2x.png" 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Mercado_Pago.svg/512px-Mercado_Pago.svg.png" 
                 alt="MP" 
                 className="h-6" 
               />
