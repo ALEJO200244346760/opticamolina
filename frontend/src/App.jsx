@@ -8,6 +8,7 @@ import Success from './pages/Success';
 import Failure from './pages/Failure';
 import Register from './pages/Register.jsx';
 import ProductDetail from './components/ProductDetail.jsx';
+import WhatsAppButton from './components/WhatsappButton.jsx';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route path="/failure" element={<Failure />} />
             </Routes>
           </main>
+          <WhatsAppButton />
         </div>
       </div>
     </Router>
