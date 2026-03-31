@@ -37,9 +37,9 @@ public class PaymentService {
 
             // 2. Configuramos las URLs de retorno (donde vuelve el usuario después de pagar)
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                    .success("http://localhost:5173/success") // Tu front en React
-                    .pending("http://localhost:5173/pending")
-                    .failure("http://localhost:5173/failure")
+                    .success("https://opticamolina.vercel.app/success") // Tu front en React
+                    .pending("https://opticamolina.vercel.app/pending")
+                    .failure("https://opticamolina.vercel.app/failure")
                     .build();
 
             // 3. Creamos la preferencia total
