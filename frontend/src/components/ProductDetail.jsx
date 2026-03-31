@@ -1,3 +1,4 @@
+// Archivo: src/pages/ProductDetail.jsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
@@ -9,7 +10,6 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showBrick, setShowBrick] = useState(false);
   
-  // Referencia para controlar el controlador del Brick y poder desmontarlo
   const brickControllerRef = useRef(null);
 
   useEffect(() => {
@@ -24,9 +24,7 @@ const ProductDetail = () => {
       });
   }, [id]);
 
-  // Función para inicializar el Brick de Tarjeta (Checkout API)
   const initCardBrick = async () => {
-    // Si ya hay un brick, no lo creamos de nuevo
     if (brickControllerRef.current) return;
 
     const mp = new window.MercadoPago('APP_USR-10780816-0593-4430-b7b9-fbec8b6ad066', {
@@ -36,57 +34,53 @@ const ProductDetail = () => {
 
     const settings = {
       initialization: {
-        amount: product.precio, // Monto total a cobrar
-      },
-      customization: {
-        paymentMethods: {
-          maxInstallments: 12,
-          types: {
-            excluded: ['ticket', 'bank_transfer'] // Solo queremos tarjetas aquí
-          }
-        },
-        visual: {
-          style: {
-            theme: 'default', // puedes usar 'dark' o 'bootstrap'
-          }
-        }
+        amount: product.precio,
       },
       callbacks: {
         onReady: () => {
-          console.log("Brick de tarjeta listo");
+          console.log("Card Brick listo");
         },
         onSubmit: (formData) => {
-          // Esta es la parte clave: enviamos los datos al nuevo endpoint /process que creamos en Java
+          // Ajustamos el formData para que coincida con lo que espera tu PaymentService.java
+          const paymentPayload = {
+            token: formData.token,
+            transaction_amount: formData.transaction_amount,
+            description: `Óptica Molina - ${product.nombre}`,
+            installments: formData.installments,
+            payment_method_id: formData.payment_method_id,
+            payer: {
+              email: formData.payer.email,
+            }
+          };
+
           return new Promise((resolve, reject) => {
-            api.post('/payments/process', {
-              ...formData,
-              description: `Compra: ${product.nombre}`
-            })
+            api.post('/payments/process', paymentPayload)
               .then((res) => {
                 if (res.data.status === 'approved') {
                   navigate('/success');
                   resolve();
                 } else {
-                  alert("El pago no pudo ser aprobado: " + res.data.status);
+                  alert("Pago no aprobado: " + res.data.status);
                   reject();
                 }
               })
               .catch((error) => {
-                console.error("Error en el proceso de pago", error);
-                alert("Error al procesar el pago.");
+                console.error("Error 400 o 500 en backend", error);
+                alert("Error al procesar el pago. Verificá los datos.");
                 reject();
               });
           });
         },
         onError: (error) => {
-          console.error("Error en Brick", error);
+          console.error("Error en Card Brick", error);
         },
       },
     };
 
+    // Usamos 'cardPayment' en lugar de 'payment' para ser más específicos
     brickControllerRef.current = await bricksBuilder.create(
-      'payment',
-      'paymentBrick_container',
+      'cardPayment', 
+      'cardPaymentBrick_container', 
       settings
     );
   };
@@ -94,10 +88,8 @@ const ProductDetail = () => {
   const handlePayment = async (method) => {
     if (method === 'card') {
       setShowBrick(true);
-      // Esperamos a que el DOM se actualice para mostrar el contenedor y renderizar el brick
       setTimeout(() => initCardBrick(), 100);
     } else {
-      // Para Mercado Pago (Billetera), usamos la preferencia tradicional
       try {
         const response = await api.post('/payments/create', {
           title: product.nombre,
@@ -165,9 +157,8 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* BOTONES DE SELECCIÓN DE MÉTODO */}
-            {!showBrick && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-500">
+            {!showBrick ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button 
                   onClick={() => handlePayment('card')}
                   className="bg-white border-2 border-black text-black py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all shadow-md active:scale-95"
@@ -182,13 +173,10 @@ const ProductDetail = () => {
                   Mercado Pago
                 </button>
               </div>
-            )}
-
-            {/* CONTENEDOR DEL FORMULARIO DE TARJETA (Solo aparece si elige Tarjeta) */}
-            {showBrick && (
+            ) : (
               <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl animate-in slide-in-from-bottom-4 duration-500">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-black text-sm uppercase tracking-widest">Datos de la Tarjeta</h3>
+                  <h3 className="font-black text-sm uppercase tracking-widest">Pago con Tarjeta</h3>
                   <button 
                     onClick={() => {setShowBrick(false); brickControllerRef.current = null;}}
                     className="text-[10px] font-bold text-red-500 uppercase tracking-tighter"
@@ -196,7 +184,8 @@ const ProductDetail = () => {
                     Cancelar
                   </button>
                 </div>
-                <div id="paymentBrick_container"></div>
+                {/* ID del contenedor actualizado para cardPayment */}
+                <div id="cardPaymentBrick_container"></div>
               </div>
             )}
 
