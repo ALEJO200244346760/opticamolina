@@ -1,11 +1,8 @@
-// Archivo: src/main/java/opticamolina/demo/services/PaymentService.java
+// Archivo: src/main/java/opticamolina/demo/service/PaymentService.java
 package opticamolina.demo.service;
 
 import com.mercadopago.MercadoPagoConfig;
-import com.mercadopago.client.preference.PreferenceBackUrlsRequest;
-import com.mercadopago.client.preference.PreferenceClient;
-import com.mercadopago.client.preference.PreferenceItemRequest;
-import com.mercadopago.client.preference.PreferenceRequest;
+import com.mercadopago.client.preference.*;
 import com.mercadopago.resources.preference.Preference;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map; // <--- AGREGAR ESTA IMPORTACIÓN
 
 @Service
 public class PaymentService {
@@ -20,11 +18,11 @@ public class PaymentService {
     @Value("${mercadopago.access.token}")
     private String accessToken;
 
-    public String createPreference(String title, Double price, Integer quantity) {
+    // CAMBIADO: Ahora devuelve un Mapa con ID y URL
+    public Map<String, String> createPreference(String title, Double price, Integer quantity) {
         try {
             MercadoPagoConfig.setAccessToken(accessToken);
 
-            // 1. Definimos el producto (anteojos, lentes, etc)
             PreferenceItemRequest itemRequest = PreferenceItemRequest.builder()
                     .title(title)
                     .quantity(quantity)
@@ -35,29 +33,30 @@ public class PaymentService {
             List<PreferenceItemRequest> items = new ArrayList<>();
             items.add(itemRequest);
 
-            // 2. Configuramos las URLs de retorno (donde vuelve el usuario después de pagar)
             PreferenceBackUrlsRequest backUrls = PreferenceBackUrlsRequest.builder()
-                    .success("https://opticamolina.vercel.app/success") // Tu front en React
+                    .success("https://opticamolina.vercel.app/success")
                     .pending("https://opticamolina.vercel.app/pending")
                     .failure("https://opticamolina.vercel.app/failure")
                     .build();
 
-            // 3. Creamos la preferencia total
             PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                     .items(items)
                     .backUrls(backUrls)
-                    .autoReturn("approved") // Vuelve solo al front si el pago se aprueba
+                    .autoReturn("approved")
                     .build();
 
             PreferenceClient client = new PreferenceClient();
             Preference preference = client.create(preferenceRequest);
 
-            // Devolvemos el link de pago (init_point)
-            return preference.getInitPoint();
+            // RETORNO CORREGIDO: Mandamos ambos datos al Controller
+            return Map.of(
+                    "id", preference.getId(),
+                    "url", preference.getInitPoint()
+            );
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error al crear la preferencia: " + e.getMessage();
+            throw new RuntimeException("Error al crear la preferencia: " + e.getMessage());
         }
     }
 }
