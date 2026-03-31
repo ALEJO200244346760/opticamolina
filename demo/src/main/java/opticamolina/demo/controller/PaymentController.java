@@ -2,6 +2,7 @@
 package opticamolina.demo.controller;
 
 import opticamolina.demo.service.PaymentService;
+import com.mercadopago.resources.payment.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,41 +10,49 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payments")
-@CrossOrigin(origins = "*") // Permite que tu React en Vercel se comunique con Railway
+@CrossOrigin(origins = "*")
 public class PaymentController {
-
-    @Autowired
-    private org.springframework.beans.factory.ObjectProvider<PaymentService> paymentServiceProvider;
 
     @Autowired
     private PaymentService paymentService;
 
-    /**
-     * Endpoint para crear una preferencia de pago en Mercado Pago.
-     * Recibe los datos del producto desde el frontend de React.
-     */
+    // -------------------------------------------------------------------
+    // ENDPOINT 1: Genera el link para "Billetera Virtual"
+    // -------------------------------------------------------------------
     @PostMapping("/create")
     public Map<String, String> create(@RequestBody Map<String, Object> data) {
         try {
-            // 1. Extraemos los datos del JSON enviado por React
             String title = (String) data.get("title");
-
-            // Usamos una conversión segura para el precio por si llega como Integer o Double
             Double price = Double.valueOf(data.get("price").toString());
-
-            // Usamos una conversión segura para la cantidad
             Integer quantity = Integer.valueOf(data.get("quantity").toString());
 
-            // 2. Llamamos al Service que ahora devuelve un Map<String, String>
-            // El mapa contiene: "id" (Preference ID) y "url" (Init Point)
-            Map<String, String> response = paymentService.createPreference(title, price, quantity);
-
-            // 3. Devolvemos el mapa completo al frontend
-            return response;
+            return paymentService.createPreference(title, price, quantity);
 
         } catch (Exception e) {
-            // Si algo falla, devolvemos un error descriptivo
             return Map.of("error", "No se pudo crear la preferencia de pago: " + e.getMessage());
+        }
+    }
+
+    // -------------------------------------------------------------------
+    // ENDPOINT 2: Procesa el pago directo con Tarjeta
+    // -------------------------------------------------------------------
+    @PostMapping("/process")
+    public Map<String, Object> processPayment(@RequestBody Map<String, Object> paymentData) {
+        try {
+            // Mandamos los datos del Brick al Service
+            Payment payment = paymentService.processCardPayment(paymentData);
+
+            // Le respondemos a React cómo salió la operación
+            return Map.of(
+                    "status", payment.getStatus(), // Puede ser "approved", "rejected", "in_process"
+                    "id", payment.getId()
+            );
+
+        } catch (Exception e) {
+            return Map.of(
+                    "status", "error",
+                    "message", e.getMessage()
+            );
         }
     }
 }

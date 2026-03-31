@@ -1,4 +1,3 @@
-// Archivo: src/pages/ProductDetail.jsx
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import api from '../api/axios';
@@ -8,10 +7,10 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [showBrick, setShowBrick] = useState(false);
   
-  // Referencia para el contenedor de Mercado Pago
-  const mpContainerRef = useRef(null);
+  // Referencia para controlar el controlador del Brick y poder desmontarlo
+  const brickControllerRef = useRef(null);
 
   useEffect(() => {
     api.get(`/public/products/${id}`)
@@ -20,43 +19,95 @@ const ProductDetail = () => {
         setLoading(false);
       })
       .catch(err => {
-        setError(true);
+        console.error("Error cargando producto", err);
         setLoading(false);
       });
   }, [id]);
 
+  // Función para inicializar el Brick de Tarjeta (Checkout API)
+  const initCardBrick = async () => {
+    // Si ya hay un brick, no lo creamos de nuevo
+    if (brickControllerRef.current) return;
+
+    const mp = new window.MercadoPago('APP_USR-10780816-0593-4430-b7b9-fbec8b6ad066', {
+      locale: 'es-AR'
+    });
+    const bricksBuilder = mp.bricks();
+
+    const settings = {
+      initialization: {
+        amount: product.precio, // Monto total a cobrar
+      },
+      customization: {
+        paymentMethods: {
+          maxInstallments: 12,
+          types: {
+            excluded: ['ticket', 'bank_transfer'] // Solo queremos tarjetas aquí
+          }
+        },
+        visual: {
+          style: {
+            theme: 'default', // puedes usar 'dark' o 'bootstrap'
+          }
+        }
+      },
+      callbacks: {
+        onReady: () => {
+          console.log("Brick de tarjeta listo");
+        },
+        onSubmit: (formData) => {
+          // Esta es la parte clave: enviamos los datos al nuevo endpoint /process que creamos en Java
+          return new Promise((resolve, reject) => {
+            api.post('/payments/process', {
+              ...formData,
+              description: `Compra: ${product.nombre}`
+            })
+              .then((res) => {
+                if (res.data.status === 'approved') {
+                  navigate('/success');
+                  resolve();
+                } else {
+                  alert("El pago no pudo ser aprobado: " + res.data.status);
+                  reject();
+                }
+              })
+              .catch((error) => {
+                console.error("Error en el proceso de pago", error);
+                alert("Error al procesar el pago.");
+                reject();
+              });
+          });
+        },
+        onError: (error) => {
+          console.error("Error en Brick", error);
+        },
+      },
+    };
+
+    brickControllerRef.current = await bricksBuilder.create(
+      'payment',
+      'paymentBrick_container',
+      settings
+    );
+  };
+
   const handlePayment = async (method) => {
-    try {
-      // 1. Pedimos la preferencia al backend
-      const response = await api.post('/payments/create', {
-        title: product.nombre,
-        price: product.precio,
-        quantity: 1,
-        payment_method: method 
-      });
-
-      // El backend debe devolver el preferenceId (id) además de la url
-      const preferenceId = response.data.id; 
-
-      if (method === 'mercadopago') {
-        // Si es MP directo, lo mandamos a la billetera
+    if (method === 'card') {
+      setShowBrick(true);
+      // Esperamos a que el DOM se actualice para mostrar el contenedor y renderizar el brick
+      setTimeout(() => initCardBrick(), 100);
+    } else {
+      // Para Mercado Pago (Billetera), usamos la preferencia tradicional
+      try {
+        const response = await api.post('/payments/create', {
+          title: product.nombre,
+          price: product.precio,
+          quantity: 1
+        });
         window.location.href = response.data.url;
-      } else {
-        // 2. Si es TARJETA, inicializamos el Checkout Pro In-Context
-        const mp = new window.MercadoPago('APP_USR-10780816-0593-4430-b7b9-fbec8b6ad066', { // <--- PONÉ TU PUBLIC KEY
-          locale: 'es-AR'
-        });
-
-        mp.checkout({
-          preference: {
-            id: preferenceId
-          },
-          autoOpen: true // Abre el modal automáticamente
-        });
+      } catch (error) {
+        alert("Error al conectar con Mercado Pago");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Error al conectar con la pasarela de pagos.");
     }
   };
 
@@ -72,7 +123,6 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-[#FDFDFD] pb-20">
       <div className="max-w-7xl mx-auto px-4 pt-10">
-        
         <button 
           onClick={() => navigate(-1)}
           className="group flex items-center text-gray-400 hover:text-black mb-10 transition-colors text-xs font-bold uppercase tracking-widest"
@@ -115,26 +165,40 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* BOTONES DE PAGO */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Botón Tarjeta: Ahora abre el Modal */}
-              <button 
-                onClick={() => handlePayment('card')}
-                className="bg-white border-2 border-black text-black py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all shadow-md active:scale-95"
-              >
-                Tarjeta de Débito o Crédito
-              </button>
+            {/* BOTONES DE SELECCIÓN DE MÉTODO */}
+            {!showBrick && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-500">
+                <button 
+                  onClick={() => handlePayment('card')}
+                  className="bg-white border-2 border-black text-black py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all shadow-md active:scale-95"
+                >
+                  Tarjeta de Débito o Crédito
+                </button>
 
-              <button 
-                onClick={() => handlePayment('mercadopago')}
-                className="bg-[#009EE3] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-[#008bc7] transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
-              >
-                Billetera Virtual
-              </button>
-            </div>
+                <button 
+                  onClick={() => handlePayment('mercadopago')}
+                  className="bg-[#009EE3] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-[#008bc7] transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95"
+                >
+                  Mercado Pago
+                </button>
+              </div>
+            )}
 
-            {/* Este div es necesario por si usás Bricks más adelante */}
-            <div id="wallet_container" ref={mpContainerRef} className="mt-4"></div>
+            {/* CONTENEDOR DEL FORMULARIO DE TARJETA (Solo aparece si elige Tarjeta) */}
+            {showBrick && (
+              <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-xl animate-in slide-in-from-bottom-4 duration-500">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="font-black text-sm uppercase tracking-widest">Datos de la Tarjeta</h3>
+                  <button 
+                    onClick={() => {setShowBrick(false); brickControllerRef.current = null;}}
+                    className="text-[10px] font-bold text-red-500 uppercase tracking-tighter"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+                <div id="paymentBrick_container"></div>
+              </div>
+            )}
 
             <div className="mt-12 flex flex-wrap gap-8 border-t border-gray-100 pt-8">
               <div className="flex items-center gap-3 italic text-[10px] text-gray-400 uppercase tracking-widest">
