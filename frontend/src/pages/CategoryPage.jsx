@@ -5,17 +5,19 @@ import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
 import Footer from '../components/Footer';
 
-const CategoryPage = ({ allCategories }) => { // recibe todas las categorías desde Home
+const CategoryPage = ({ allCategories }) => {
   const { id } = useParams();
 
   const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState(null);
+  const [category, setCategory] = useState({ id, name: "Categoría" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // buscar la categoría en allCategories si está disponible
-    const cat = allCategories?.find((c) => c.id.toString() === id.toString());
-    setCategory(cat || { id, name: "Categoría" });
+    // Buscar categoría en allCategories si está disponible
+    const catFromList = allCategories?.find((c) => c.id.toString() === id.toString());
+    if (catFromList) {
+      setCategory(catFromList);
+    }
 
     fetchProducts();
   }, [id, allCategories]);
@@ -24,6 +26,13 @@ const CategoryPage = ({ allCategories }) => { // recibe todas las categorías de
     try {
       const res = await api.get(`/public/products/category/${id}`);
       setProducts(res.data);
+
+      // Si no se encontró la categoría en allCategories, tomar nombre desde el primer producto
+      if (!allCategories || !allCategories.find((c) => c.id.toString() === id.toString())) {
+        if (res.data.length > 0 && res.data[0].category) {
+          setCategory(res.data[0].category);
+        }
+      }
     } catch (error) {
       console.error("Error cargando productos de la categoría:", error);
     } finally {
@@ -47,7 +56,6 @@ const CategoryPage = ({ allCategories }) => { // recibe todas las categorías de
       </div>
 
       <main className="container mx-auto px-6 md:px-12 py-20">
-
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
             {[...Array(8)].map((_, i) => (
@@ -72,7 +80,6 @@ const CategoryPage = ({ allCategories }) => { // recibe todas las categorías de
             ))}
           </div>
         )}
-
       </main>
 
       <Footer />
