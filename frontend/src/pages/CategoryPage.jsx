@@ -48,50 +48,50 @@ const CategoryPage = ({ allCategories }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+  <div className="min-h-screen bg-white text-[#6B21A8]">
 
-      {/* HERO / HEADER */}
-      <div className="py-20 px-6 border-b border-[#1a1a1a]">
-        <div className="container mx-auto">
-          <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tight">
-            {category?.name}
-          </h1>
-          <p className="text-gray-500 mt-2 text-sm uppercase tracking-widest">
-            Explorá la colección completa
-          </p>
-        </div>
+    {/* HERO / HEADER */}
+    <div className="py-20 px-6 border-b border-gray-300">
+      <div className="container mx-auto">
+        <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tight">
+          {category?.name}
+        </h1>
+        <p className="text-gray-600 mt-2 text-sm uppercase tracking-widest">
+          Explorá la colección completa
+        </p>
       </div>
-
-      <main className="container mx-auto px-6 md:px-12 py-20">
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
-            {[...Array(8)].map((_, i) => (
-              <ProductSkeleton key={i} />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-32">
-            <h3 className="text-xl text-gray-400 italic uppercase">
-              Sin productos en esta categoría
-            </h3>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-16">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="group transition-all duration-500 hover:scale-[1.02]"
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      <Footer />
     </div>
-  );
+
+    <main className="container mx-auto px-6 md:px-12 py-20">
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+          {[...Array(8)].map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-32">
+          <h3 className="text-xl text-gray-500 italic uppercase">
+            Sin productos en esta categoría
+          </h3>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-16">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="group transition-all duration-500 hover:scale-[1.02]"
+            >
+              <ProductCard product={product} />
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
+
+    <Footer />
+  </div>
+);
 };
 
 export default CategoryPage;
