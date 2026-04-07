@@ -13,30 +13,37 @@ const CategoryPage = ({ allCategories }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Buscar categoría en allCategories si está disponible
+    // Primero intentar obtener la categoría desde allCategories
     const catFromList = allCategories?.find((c) => c.id.toString() === id.toString());
     if (catFromList) {
       setCategory(catFromList);
+    } else {
+      // Si no está en allCategories, buscar desde backend
+      fetchCategoryById();
     }
 
     fetchProducts();
   }, [id, allCategories]);
 
+  // Traer productos de la categoría
   const fetchProducts = async () => {
     try {
       const res = await api.get(`/public/products/category/${id}`);
       setProducts(res.data);
-
-      // Si no se encontró la categoría en allCategories, tomar nombre desde el primer producto
-      if (!allCategories || !allCategories.find((c) => c.id.toString() === id.toString())) {
-        if (res.data.length > 0 && res.data[0].category) {
-          setCategory(res.data[0].category);
-        }
-      }
     } catch (error) {
       console.error("Error cargando productos de la categoría:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Traer categoría desde backend si no está en allCategories
+  const fetchCategoryById = async () => {
+    try {
+      const res = await api.get(`/public/categories/${id}`);
+      setCategory(res.data);
+    } catch (error) {
+      console.error("Error cargando categoría:", error);
     }
   };
 
