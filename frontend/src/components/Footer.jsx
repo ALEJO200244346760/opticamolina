@@ -31,7 +31,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
             >
-              Ubicación Córdoba
+              Av. Castro Barros 485
             </a>
             
             <a 
@@ -56,7 +56,15 @@ const Footer = () => {
                 Ver ubicación en mapa
               </a>
             </p>
-            <p>📞 351 679 7785</p>
+            <p>
+              📞{" "}
+              <a 
+                href="tel:+543516797785" 
+                className="hover:text-white transition-colors"
+              >
+                351 679 7785
+              </a>
+            </p>
             <p>🕒 Lunes a viernes: 9 a 13 hs — 16 a 20 hs</p>
           </div>
           
