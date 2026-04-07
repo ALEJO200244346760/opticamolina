@@ -32,13 +32,11 @@ const Home = () => {
 
   // 🔹 Agrupar productos por categoría (dinámico desde backend)
   const groupedProducts = categories.map((cat) => ({
-    ...cat,
-    items: products.filter(
-      (p) =>
-        p.categoryId === cat.id || // opción 1 (recomendado)
-        p.category === cat.name    // opción 2 (por si usás nombre)
-    )
-  }));
+  ...cat,
+  items: products.filter(
+    (p) => p.category?.id === cat.id
+  )
+}));
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
