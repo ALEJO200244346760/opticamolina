@@ -5,7 +5,7 @@ import ProductCard from '../components/ProductCard';
 import ProductSkeleton from '../components/ProductSkeleton';
 import Footer from '../components/Footer';
 
-const CategoryPage = () => {
+const CategoryPage = ({ allCategories }) => { // recibe todas las categorías desde Home
   const { id } = useParams();
 
   const [products, setProducts] = useState([]);
@@ -13,25 +13,23 @@ const CategoryPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCategoryData();
-  }, [id]);
+    // buscar la categoría en allCategories si está disponible
+    const cat = allCategories?.find((c) => c.id.toString() === id.toString());
+    setCategory(cat || { id, name: "Categoría" });
 
-  const fetchCategoryData = async () => {
+    fetchProducts();
+  }, [id, allCategories]);
+
+  const fetchProducts = async () => {
     try {
-        const [productsRes, categoryRes] = await Promise.all([
-        api.get(`/public/products/category/${id}`), // <-- endpoint correcto
-        api.get(`/public/categories/${id}`)
-        ]);
-
-        setProducts(productsRes.data);
-        setCategory(categoryRes.data);
-
+      const res = await api.get(`/public/products/category/${id}`);
+      setProducts(res.data);
     } catch (error) {
-        console.error("Error cargando categoría:", error);
+      console.error("Error cargando productos de la categoría:", error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   return (
     <div className="min-h-screen bg-[#050505] text-white">
@@ -40,7 +38,7 @@ const CategoryPage = () => {
       <div className="py-20 px-6 border-b border-[#1a1a1a]">
         <div className="container mx-auto">
           <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tight">
-            {category?.name || "Categoría"}
+            {category?.name}
           </h1>
           <p className="text-gray-500 mt-2 text-sm uppercase tracking-widest">
             Explorá la colección completa
@@ -50,25 +48,19 @@ const CategoryPage = () => {
 
       <main className="container mx-auto px-6 md:px-12 py-20">
 
-        {/* LOADING */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
             {[...Array(8)].map((_, i) => (
               <ProductSkeleton key={i} />
             ))}
           </div>
-
         ) : products.length === 0 ? (
-
           <div className="text-center py-32">
             <h3 className="text-xl text-gray-400 italic uppercase">
               Sin productos en esta categoría
             </h3>
           </div>
-
         ) : (
-
-          // 🔥 GALERÍA (igual a tu estilo original)
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-10 gap-y-16">
             {products.map((product) => (
               <div
@@ -79,8 +71,8 @@ const CategoryPage = () => {
               </div>
             ))}
           </div>
-
         )}
+
       </main>
 
       <Footer />
