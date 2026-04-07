@@ -57,7 +57,7 @@ const CategoryPage = ({ allCategories }) => {
             {category?.name}
           </h1>
           <p className="text-gray-500 mt-2 text-sm uppercase tracking-widest">
-            Explorá la colección completa
+            Explorá la colección completaa
           </p>
         </div>
       </div>
