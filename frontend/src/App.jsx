@@ -15,12 +15,12 @@ import CategoryPage from './pages/CategoryPage';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white font-sans text-gray-200 selection:bg-[#4a0e2e] selection:text-white">
+      <div className="min-h-screen bg-white font-sans text-gray-800 selection:bg-pink-200 selection:text-black">
         
-        {/* Gradiente de fondo fijo para dar esa sensación del logo en toda la app */}
+        {/* Gradiente suave opcional (modo claro) */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] bg-[#4a0e2e] opacity-[0.07] blur-[120px] rounded-full"></div>
-          <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-[#1a1a1a] opacity-[0.1] blur-[100px] rounded-full"></div>
+          <div className="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] bg-pink-200 opacity-[0.2] blur-[120px] rounded-full"></div>
+          <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-gray-200 opacity-[0.3] blur-[100px] rounded-full"></div>
         </div>
 
         <div className="relative z-10">
