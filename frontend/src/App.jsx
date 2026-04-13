@@ -12,6 +12,8 @@ import ProductDetail from './components/ProductDetail.jsx';
 import WhatsAppButton from './components/WhatsappButton.jsx';
 import Pending from './pages/Pending.jsx';
 import CategoryPage from './pages/CategoryPage';
+import ForgotPassword from './pages/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               
               {/* Paneles de Administración */}
               <Route path="/admin" element={<AdminPanel />} /> 
